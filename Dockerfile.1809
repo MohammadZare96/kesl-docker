@@ -1,0 +1,31 @@
+# syntax = docker/dockerfile:1.0-experimental
+
+FROM oraclelinux:9
+
+ARG SRVC_DIR="/root/kesl-service"
+ARG PATH="/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+LABEL maintainer="Kaspersky <support@kaspersky.com>"
+#
+# proxy (optional)
+#
+# ENV http_proxy=http://user:password@server:port/
+# ENV https_proxy=https://user:password@server:port/
+
+ADD ./repo.ext /etc/yum.repos.d/new.repo
+RUN --mount=type=bind,target=/root/tmp,source=. \
+    yum update -y && \
+    yum -y install perl which python3-pip podman openssl && yum clean all && \
+    pip3 install --no-cache-dir --default-timeout=100 flask && \
+    pip3 install --no-cache-dir --default-timeout=100 waitress && \
+    pip3 install --no-cache-dir --default-timeout=100 pyyaml && \
+    pip3 install --no-cache-dir --default-timeout=100 requests && \
+    pip3 install --no-cache-dir --default-timeout=100 setuptools && \
+    pip3 install --no-cache-dir --default-timeout=100 validators && \
+    pip3 install --no-cache-dir --default-timeout=100 python-dateutil && \
+    pip3 install --no-cache-dir --default-timeout=100 pydantic && \
+    rpm -ivh /root/tmp/klnagent.rpm /root/tmp/kesl-12.0.0-6672.x86_64.rpm && \
+    mkdir -p $SRVC_DIR && cp /root/tmp/kesl-service/* $SRVC_DIR/ && chmod +x $SRVC_DIR/startup.sh
+
+EXPOSE 8085
+WORKDIR $SRVC_DIR
+ENTRYPOINT ["python3", "main.py"]

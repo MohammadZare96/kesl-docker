@@ -1,0 +1,33 @@
+#!/bin/sh
+VOLUME_ROOT=$PWD/../VOLUME
+
+#
+# available mount points
+#   /var/opt/kaspersky/kesl/common/updates: OPTIONAL (antivirus databases) REQUIRED for multi-services system
+#   /var/log/kaspersky:                     OPTIONAL (service logs)
+#   /root/kesl-service/data:                OPTIONAL (mysql scans database) REQUIRED for multi-services system
+#   /root/kesl-service/config:              OPTIONAL (storage for kesl-services.conf files)
+#   /root/kesl-service/certificates:        OPTIONAL (storage for reposytories certificates)
+#   /var/lib/containers/vfs-storage:        OPTIONAL (podman image storage location)
+#
+# available service environments (ALL OPTIONAL):
+#   KRAS4D_LOGLEVEL='debug':                log level ('debug'|'info'|'warning'|'error'|'critical') (default: 'noset')
+#   KRAS4D_ACTIVATION='code|file_name':     if defined, service try to activate KESL after start
+#   KRAS4D_PORT=8085:                       listening port (correspondent woth -p option) (default: 8085)
+#   KRAS4D_XAPIKEY=0000:                    check for value in x-api-key header (default: no check)
+#   KRAS4D_FORCEUPDATE=True:                start antivirus update immediatly (default: false)
+#
+
+#
+#
+#
+docker run --privileged -it --rm -p 8085:8085 --init                             \
+    -e KRAS4D_PORT=8085                                             \
+    -e KRAS4D_LOGLEVEL='debug'                                      \
+    -e KRAS4D_FORCEUPDATE=True                                      \
+    -v $VOLUME_ROOT/log:/var/log/kaspersky                          \
+    -v $VOLUME_ROOT/config:/root/kesl-service/config                \
+    -v $VOLUME_ROOT/bases:/var/opt/kaspersky/kesl/common/updates    \
+    -v $VOLUME_ROOT/certificates:/root/kesl-service/certificates    \
+    -v $VOLUME_ROOT/vfs-storage:/var/lib/containers/vfs-storage     \
+    kesl-service

@@ -1,0 +1,28 @@
+common:
+  port: 8085
+  sqlpath: './data/scans.sqlite'
+  tmppath: './tmp/'
+  keypath: './keys/'
+  certdir: './certificates/'
+  logpath: '/var/log/kaspersky/kesl-service/'
+  loglevel: 'debug'
+control:
+  xapikey: 0000
+  activation: XXXX-XXXX-XXXX-XXXX
+  scanoptions: 'ScanArchives=yes'
+  forceupdate: True
+  detectaction: 'Skip'
+  skipimageifexists: False
+repositories:
+  repo.server.com:500:
+    certificate: cert.pem
+    credentials:
+      user: user
+      pass: password
+  repo1.server.com:
+    certificate: cert1.pem
+    credentials:
+      user: user1
+      pass: password1
+
+
